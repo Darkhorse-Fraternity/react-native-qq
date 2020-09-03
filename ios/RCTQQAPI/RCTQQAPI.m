@@ -255,7 +255,7 @@ RCT_EXPORT_METHOD(logout)
     NSMutableDictionary *body = @{@"type":@"QQShareResponse"}.mutableCopy;
     body[@"errMsg"] = resp.errorDescription;
     if (resp.errorDescription) {
-        body[@"errCode"] = @(-1);
+        body[@"errCode"] = @(1);
     }
     else {
         body[@"errCode"] = @(0);
@@ -287,11 +287,12 @@ RCT_EXPORT_METHOD(logout)
 - (void)tencentDidNotLogin:(BOOL)cancelled
 {
     NSMutableDictionary *body = @{@"type":@"QQAuthorizeResponse"}.mutableCopy;
-    body[@"errCode"] = @(-1);
     if (cancelled) {
+        body[@"errCode"] = @(2);
         body[@"errMsg"] = @"login canceled";
     }
     else {
+        body[@"errCode"] = @(1);
         body[@"errMsg"] = @"login failed";
     }
     [self sendEventWithName:@"QQ_Resp" body:body];

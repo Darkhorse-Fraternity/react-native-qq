@@ -215,9 +215,7 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
 
     @Override
     public void onComplete(Object o) {
-
         WritableMap resultMap = Arguments.createMap();
-
         if (isLogin) {
             resultMap.putString("type", "QQAuthorizeResponse");
             try {
@@ -228,13 +226,11 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
                 resultMap.putString("oauth_consumer_key", this.appId);
                 resultMap.putDouble("expires_in", (new Date().getTime() + obj.getLong(Constants.PARAM_EXPIRES_IN)));
             } catch (Exception e){
-                WritableMap map = Arguments.createMap();
-                map.putInt("errCode", Constants.ERROR_UNKNOWN);
-                map.putString("errMsg", e.getLocalizedMessage());
-
+                resultMap.putInt("errCode", Constants.ERROR_UNKNOWN);
+                resultMap.putString("errMsg", e.getLocalizedMessage());
                 getReactApplicationContext()
                         .getJSModule(RCTNativeAppEventEmitter.class)
-                        .emit("QQ_Resp", map);
+                        .emit("QQ_Resp", resultMap);
             }
         } else {
             resultMap.putString("type", "QQShareResponse");
@@ -248,18 +244,26 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
     @Override
     public void onError(UiError uiError) {
         WritableMap resultMap = Arguments.createMap();
+        resultMap.putString("type", _getType());
         resultMap.putInt("errCode", SHARE_RESULT_CODE_FAILED);
-        resultMap.putString("message", "Share failed." + uiError.errorDetail);
-
+        if(this.isLogin){
+            resultMap.putString("message", "Login failed." + uiError.errorDetail);
+        }else {
+            resultMap.putString("message", "Share failed." + uiError.errorDetail);
+        }
         this.resolvePromise(resultMap);
     }
 
     @Override
     public void onCancel() {
         WritableMap resultMap = Arguments.createMap();
+        resultMap.putString("type", _getType());
         resultMap.putInt("errCode", SHARE_RESULT_CODE_CANCEL);
-        resultMap.putString("message", "Share canceled.");
-
+        if(this.isLogin){
+            resultMap.putString("message", "Login canceled.");
+        }else {
+            resultMap.putString("message", "Share canceled.");
+        }
         this.resolvePromise(resultMap);
     }
 
